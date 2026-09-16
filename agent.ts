@@ -12,6 +12,7 @@ type CatalogModel = {
 	id: string;
 	category?: string;
 	output_modalities?: string[];
+	supported_endpoints?: string[];
 	pricing?: {
 		promptTextTokens?: string;
 		completionTextTokens?: string;
@@ -114,12 +115,14 @@ async function pickModel(
 		}
 	}
 
-	// Text models from the live catalog, healthy, with honest pricing.
+	// Text models from the live catalog, healthy, with honest pricing, that
+	// actually support the stateless Responses API the agent forwards to.
 	// Router agents are excluded so this model never routes to itself.
 	const candidates: Candidate[] = [];
 	for (const m of catalog.data ?? []) {
 		if (m.category !== "text") continue;
 		if (!(m.output_modalities ?? []).includes("text")) continue;
+		if (!(m.supported_endpoints ?? []).includes("/v1/responses")) continue;
 		if (m.id.includes("router")) continue;
 		const health = m.health ?? {};
 		if (health.stale) continue;
