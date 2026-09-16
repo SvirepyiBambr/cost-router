@@ -194,10 +194,27 @@ export default async function agent({
 		body: JSON.stringify({ ...body, model }),
 	});
 
-	// Surface the routing decision without touching the model's answer.
+	// Surface the routing decision without touching the model's answer:
+	// headers (best-effort, may be stripped by the gateway) plus a short
+	// top-level trace on non-streaming JSON responses.
 	const headers = new Headers(forward.headers);
 	headers.set("X-Router-Model", model);
 	headers.set("X-Router-Reason", reason);
+
+	const contentType = forward.headers.get("content-type") ?? "";
+	if (contentType.includes("application/json")) {
+		try {
+			const payload = (await forward.json()) as Record<string, unknown>;
+			payload.router_trace = { model, reason };
+			return new Response(JSON.stringify(payload), {
+				status: forward.status,
+				statusText: forward.statusText,
+				headers,
+			});
+		} catch {
+			// fall through to raw forwarding
+		}
+	}
 	return new Response(forward.body, {
 		status: forward.status,
 		statusText: forward.statusText,
