@@ -163,9 +163,10 @@ async function pickModel(
 	if (band === "DEEP") {
 		pick = [...(bands.DEEP.length ? bands.DEEP : candidates)].sort(byLatency)[0];
 	} else if (band === "STANDARD") {
-		pick =
-			bands.STANDARD[0] ??
-			candidates[Math.min(tertile, candidates.length - 1)];
+		// Middle of the band by price so STANDARD never lands on the same
+		// model as LIGHT when prices cluster at the band boundary.
+		const band2 = bands.STANDARD.length ? bands.STANDARD : candidates;
+		pick = band2[Math.floor(band2.length / 2)];
 	} else {
 		pick = [...bands.LIGHT].sort(byLatency)[0] ?? candidates[0];
 	}
