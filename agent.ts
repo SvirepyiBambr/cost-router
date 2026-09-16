@@ -33,7 +33,9 @@ type StatusRow = {
 const FALLBACK_MODEL = "openai";
 const MIN_SUCCESS_RATE = 0.9;
 const LIGHT_SCORE = 2;
-const DEEP_SCORE = 4;
+// A heavy prompt tops out around 3 (length cap) + 1.5 (code) + 1.5 (task
+// markers) — 3.5 keeps genuine design/prove work out of STANDARD.
+const DEEP_SCORE = 3.5;
 
 const COMPLEX_TASK =
 	/(implement|design|prove|derive|optimi[sz]e|debug|architect|research|analy[sz]e|migrat|refactor|реализуй|спроектируй|докажи|оптимизируй|проанализируй|исслед)/i;
