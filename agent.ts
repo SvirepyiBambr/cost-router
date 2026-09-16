@@ -38,7 +38,7 @@ const LIGHT_SCORE = 2;
 const DEEP_SCORE = 3.5;
 
 const COMPLEX_TASK =
-	/(implement|design|prove|derive|optimi[sz]e|debug|architect|research|analy[sz]e|migrat|refactor|реализуй|спроектируй|докажи|оптимизируй|проанализируй|исслед)/i;
+	/(implement|design|prove|derive|optimi[sz]e|debug|architect|research|analy[sz]e|migrat|refactor|реализуй|спроектируй|докажи|оптимизируй|проанализируй|исслед)/gi;
 
 const extractText = (value: unknown): string => {
 	if (typeof value === "string") return value;
@@ -61,7 +61,9 @@ const extractText = (value: unknown): string => {
 const scoreInput = (text: string): number => {
 	let score = Math.min(text.length / 400, 3);
 	if (/```/.test(text)) score += 1.5;
-	if (COMPLEX_TASK.test(text)) score += 1.5;
+	// count every task marker, not just the first one
+	const matches = text.match(COMPLEX_TASK) ?? [];
+	score += Math.min(matches.length * 1.5, 3);
 	score += Math.min((text.match(/\?/g) ?? []).length * 0.3, 1.5);
 	return score;
 };
