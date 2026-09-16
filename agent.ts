@@ -178,9 +178,6 @@ async function pickModel(
 	return { model: pick.id, reason };
 }
 
-const fmtLatency = (p50: number): string =>
-	Number.isFinite(p50) ? `${Math.round(p50)}ms` : "no fresh data";
-
 export default async function agent({
 	request,
 	pollinations,
